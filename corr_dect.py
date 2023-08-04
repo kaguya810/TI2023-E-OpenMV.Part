@@ -22,7 +22,7 @@ uart = UART(3, 9600,timeout_char=3000)
 
 while(True):
     clock.tick()
-    img = sensor.snapshot().lens_corr(0.7).replace(vflip=1,hmirror=1,transpose=0).binary([(0, 39, -11, 20, -14, 20)])
+    img = sensor.snapshot().lens_corr(0.7).replace(vflip=1,hmirror=1,transpose=0).binary([(0, 50, -11, 20, -14, 20)])
 
 # -----矩形框部分-----
     # 在图像中寻找矩形
@@ -53,12 +53,6 @@ while(True):
 
 
         # 按照逆时针遍历，以左下角点为入口
-        # 1，2位返回坐标，3位返回次序
-            FH = bytearray([0x2C,0x12,corner[0][0], corner[0][1],1,1,0x5B])
-            uart.write(FH)
-            FH = bytearray([0x2C,0x12,corner[3][0], corner[3][1],2,1,0x5B])
-            uart.write(FH)
-            FH = bytearray([0x2C,0x12,corner[2][0], corner[2][1],3,1,0x5B])
-            uart.write(FH)
-            FH = bytearray([0x2C,0x12,corner[1][0], corner[1][1],4,1,0x5B])
+        # 0,3,2,1返回坐标
+            FH = bytearray([0x2C,0x12,corner[3][0], corner[3][1],corner[2][0],corner[2][1],corner[1][0],corner[1][1],corner[0][0],corner[0][1],0x5B])
             uart.write(FH)
