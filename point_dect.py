@@ -10,7 +10,7 @@ uart = UART(3, 9600,timeout_char=3000)
 #pan_servo.calibration(500,2500,500)
 #tilt_servo.calibration(500,2500,500)
 
-red_threshold  = (56, 100, 7, 127, 0, 24)
+red_threshold  = (0, 100, 12, 127, -3, 127)
 
 pan_pid = PID(p=0.0732, i=0, imax=90) #脱机运行或者禁用图像传输，使用这个PID
 tilt_pid = PID(p=0.06, i=0, imax=90) #脱机运行或者禁用图像传输，使用这个PID
@@ -58,7 +58,7 @@ while(True):
         tilt_error = max_blob.cy()-img.height()/2
         #print("pan_error: ", pan_error
         img.draw_rectangle(max_blob.rect()) # rect
-        img.draw_cross(max_blob.cx(), max_blob.cy()) # cx, cy
+        #img.draw_cross(max_blob.cx(), max_blob.cy()) # cx, cy
         pan_output=pan_pid.get_pid(pan_error,1)/2
         tilt_output=tilt_pid.get_pid(tilt_error,1)
         print("pan_output",pan_output)
@@ -69,8 +69,12 @@ while(True):
         cy=(int)(tilt_output*10)
         print(cx)
         print(cy)
-        FH=bytearray([0x2C,0x12,cx,cy,1,1,0x5B])
+        flag = 0
+        if max_blob:
+            flag = 1
+        else :
+            flag = 0
+        FH=bytearray([0x2C,0x12,cx,cy,flag,1,0x5B])
         uart.write(FH)
         cx=0
         cy=0
-
